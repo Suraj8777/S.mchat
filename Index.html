@@ -1,0 +1,235 @@
+<div class="chat-container" id="chatContainer">
+  <!-- Video Stream Section -->
+  <div class="video-container">
+    <video id="const localStream = await getUserMedia({video: true, audio: true});
+const peerConnection = new RTCPeerConnection(iceConfig);
+localStream.getTracks().forEach(track => {
+    peerConnection.addTrack(track, localStream);
+});" autoplay muted></video>
+    <video id="const remoteVideo = document.querySelector('#remoteVideo');
+
+peerConnection.addEventListener('track', async (event) => {
+    const [remoteStream] = event.streams;
+    remoteVideo.srcObject = remoteStream;
+});" autoplay>const remoteVideo = document.querySelector('#remoteVideo');
+
+peerConnection.addEventListener('track', async (event) => {
+    const [remoteStream] = event.streams;
+    remoteVideo.srcObject = remoteStream;
+});</video>
+  </div>
+  
+  <!-- Chat Section -->
+  <div class="chat-box" id="chatBox">
+    <div class="messages" id="messages"></div>
+    <div class="input-container">
+      <input type="text" id="messageInput" placeholder="Type your message...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+  
+  <!-- Control Buttons -->
+  <div class="controls">
+    <button id="startBtn" onclick="startChat()">Start Chat</button>
+    <button id="stopBtn" onclick="stopChat()" disabled>Disconnect</button>
+  </div>
+</div>
+
+<style>
+.chat-container {
+  max-width: 800px;
+  margin: 20px auto;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background: #000;
+}
+
+#localVideo {
+  position: absolute;
+  width: 200px;
+  height: 150px;
+  bottom: 10px;
+  right: 10px;
+  border: 2px solid white;
+  border-radius: 5px;
+}
+
+#remoteVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.chat-box {
+  background: #f5f5f5;
+  padding: 15px;
+}
+
+.messages {
+  height: 200px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: white;
+  border-radius: 5px;
+}
+
+.input-container {
+  display: flex;
+  gap: 10px;
+}
+
+input[type="text"] {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  padding: 8px 15px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+.controls {
+  padding: 10px;
+  background: #e9ecef;
+  text-align: center;
+}
+</style>
+
+<script>
+// Simple mock connection logic
+let localStream;
+let isConnected = false;
+
+async function startChat() {
+  try {
+    // Get user media
+    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    document.getElementById('localVideo').srcObject = localStream;
+    
+    // Mock connection
+    isConnected = true;
+    document.getElementById('startBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
+    document.getElementById('chatBox').style.display = 'block';
+    
+    // Simulate stranger connection
+    setTimeout(() => {
+      addMessage('Stranger', 'Hello!');
+    }, 1000);
+    
+  } catch (error) {
+    console.error('Error accessing media devices:', error);
+  }
+}
+
+function stopChat() {
+  isConnected = false;
+  localStream.getTracks().forEach(track => track.stop());
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('stopBtn').disabled = true;
+  document.getElementById('chatBox').style.display = 'none';
+  document.getElementById('messages').innerHTML = '';
+}
+
+function sendMessage() {
+  const input = document.getElementById('messageInput');
+  const message = input.value.trim();
+  
+  if (message && isConnected) {
+    addMessage('You', message);
+    // Simulate stranger response
+    setTimeout(() => {
+      addMessage('Stranger', 'Thanks for your message!');
+    }, 500);
+    input.value = '';
+  }
+}
+
+function addMessage(sender, text) {
+  const messages = document.getElementById('messages');
+  const messageDiv = document.createElement('div');
+  messageDiv.innerHTML = <strong>${sender}:</strong> ${text};
+  messages.appendChild(messageDiv);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// Handle Enter key for sending messages
+document.getElementById('messageInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    sendMessage();
+  }
+});
+</script>let peerConnection;
+const socket = io('https://github.com/webrtc/FirebaseRTC');
+
+// cd FirebaseRTC
+//const offer = await peerConnection.createOffer();
+await peerConnection.setLocalDescription(offer);
+
+const roomWithOffer = {
+    offer: {
+        type: offer.type,
+        sdp: offer.sdp
+    }
+}
+const roomRef = await db.collection('rooms').add(roomWithOffer);
+const roomId = roomRef.id;
+document.querySelector('#currentRoom').innerText = Current room is ${roomId} - You are the caller!
+//roomRef.onSnapshot(async snapshot -> {
+    console.log('Got updated room:', snapshot.data());
+    const data = snapshot.data();
+    if (!peerConnection.currentRemoteDescription && data.answer) {
+        console.log('Set remote description: ', data.answer);
+        const answer = new RTCSessionDescription(data.answer)
+        await peerConnection.setRemoteDescription(answer);
+    }
+}); const offer = roomSnapshot.data().offer;
+await peerConnection.setRemoteDescription(offer);
+const answer = await peerConnection.createAnswer();
+await peerConnection.setLocalDescription(answer);
+
+const roomWithAnswer = {
+    answer: {
+        type: answer.type,
+        sdp: answer.sdp
+    }
+}
+await roomRef.update(roomWithAnswer);
+//async function collectIceCandidates(roomRef, peerConnection,
+                                    localName, remoteName) {
+    const candidatesCollection = roomRef.collection(localName);
+
+    peerConnection.addEventListener('icecandidate', event -> {
+        if (event.candidate) {
+            const json = event.candidate.toJSON();
+            candidatesCollection.add(json);
+        }
+    });
+
+    roomRef.collection(remoteName).onSnapshot(snapshot -> {
+        snapshot.docChanges().forEach(change -> {
+            if (change.type === "added") {
+                const candidate = new RTCIceCandidate(change.doc.data());
+                peerConnection.addIceCandidate(candidate);
+            }
+        });
+    })
+}
